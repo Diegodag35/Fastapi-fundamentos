@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel 
 #clase BaseModel me ayuda a crear modelos
 #fastapi
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi import Body
 
 
@@ -44,14 +44,37 @@ def home():
 def create_person(person: Person = Body(...)):
     return person
 
+#validaciones query parameters
+
+@app.get("/person/detail")
+def show_person(
+    name: Optional[str] = Query(None, min_length=1, max_length=50),
+    age: Optional[int] = Query(...)
+):
+
+    return {name: age}
+
+
 @app.post("/mas/pendulo")
 def periodo(pendulo: Pendulo = Body(...)):
     return pendulo
 
-"""@app.get("/mas/pendulo/periodo/?longitud=2")
-def periodo_pendulo():
-    periodo = longitud * 2
-    return {"periodo": "periodo"}"""
+@app.get("/mas/pendulo/periodo/details")
+def periodo_pendulo(
+    longitud: Optional[float] = Query(
+        ...,
+        gt=0,
+        lt=100,
+        title="Longitud para determinar el periodo de un pendulo",
+        description="longitud de la cuerda"
+        ),
+    masa: Optional[float] =Query(
+        None,
+        )
+    
+):
+    return {longitud: masa}
+
 #path parameter--una variable dentro de un path es obligatorio 
 # pasarlo se define con llaves. parametro que yo puedo enviar 
 # de manera obligatoria a cuaquier endpoint de mi api
