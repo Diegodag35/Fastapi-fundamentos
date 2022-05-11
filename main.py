@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel 
 #clase BaseModel me ayuda a crear modelos
 #fastapi
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 from fastapi import Body
 
 
@@ -48,13 +48,36 @@ def create_person(person: Person = Body(...)):
 
 @app.get("/person/detail")
 def show_person(
-    name: Optional[str] = Query(None, min_length=1, max_length=50),
+    name: Optional[str] = Query(
+        None, 
+        min_length=1, 
+        max_length=50,
+        title="Person Name",
+        description="This is the person name. It's between 1 abd 50 characters"
+        ),
     age: Optional[int] = Query(...)
 ):
 
     return {name: age}
 
+#validations path parameters
 
+@app.get("/person/details/{person_id}")
+def show_person(
+    person_id: int = Path(
+        ...,
+        gt=0, 
+        le=9999,
+        title="Person Id",
+        description="this is the person ID"
+
+        )
+):
+    return {person_id: "It exists!"}
+
+
+
+#----------------------------------------------------
 @app.post("/mas/pendulo")
 def periodo(pendulo: Pendulo = Body(...)):
     return pendulo
@@ -79,7 +102,7 @@ def periodo_pendulo(
 # pasarlo se define con llaves. parametro que yo puedo enviar 
 # de manera obligatoria a cuaquier endpoint de mi api
 
-#query Parameters: un parametro opcional estops parametros
+#query Parameters: un parametro opcional estos parametros
 #se ponen despues de ? y &. ? simbolo que permite saber donde
 #  comieza el query parameter.
 #_________________________________________________
